@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,22 +12,24 @@ namespace DiscordExample
 {
     class StandardModule : IModule
     {
-        private ModuleManager _m;
+        private DiscordClient _client;
+        private ModuleManager _manager;
 
-        public void Install(ModuleManager manager)
+        void IModule.Install(ModuleManager manager)
         {
-            _m = manager;
+            _manager = manager;
+            _client = manager.Client;
 
-            _m.CreateCommands("", g =>
+            manager.CreateCommands("", cgb =>
             {
-                g.CreateCommand("say")
-                .MinPermissions((int)PermissionLevel.BotOwner)
-                .Description("Make the bot speak!")
-                .Parameter("text", ParameterType.Unparsed)
-                .Do(async e =>
-                {
-                    await e.Channel.SendMessage(e.GetArg("text"));
-                });
+                cgb.CreateCommand("say")
+                    .MinPermissions((int)PermissionLevel.BotOwner)
+                    .Description("Make the bot speak!")
+                    .Parameter("text", ParameterType.Unparsed)
+                    .Do(async e =>
+                    {
+                        await e.Channel.SendMessage(e.GetArg("text"));
+                    });
             });
         }
     }
