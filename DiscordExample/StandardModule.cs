@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,17 +12,19 @@ namespace DiscordExample
 {
     class StandardModule : IModule
     {
-        private ModuleManager _m;
+        private DiscordClient _client;
+        private ModuleManager _manager;
 
-        public void Install(ModuleManager manager)
+        void IModule.Install(ModuleManager manager)
         {
-            _m = manager;
+            _manager = manager;
+            _client = manager.Client;
 
-            _m.CreateCommands("", g =>
+            manager.CreateCommands("", cgb =>
             {
                 g.MinPermissions((int)PermissionLevel.User);
 
-                g.CreateCommand("say")
+                cgb.CreateCommand("say")
                 .MinPermissions((int)PermissionLevel.BotOwner) // An unrestricted say command is a bad idea
                 .Description("Make the bot speak!")
                 .Parameter("text", ParameterType.Unparsed)
@@ -31,7 +33,7 @@ namespace DiscordExample
                     await e.Channel.SendMessage(e.GetArg("text"));
                 });
 
-                g.CreateCommand("params")
+                cgb.CreateCommand("params")
                 .Description("Multiple paramter test")
                 .Parameter("text", ParameterType.Multiple)
                 .Do(async e =>
