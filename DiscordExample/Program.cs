@@ -30,7 +30,11 @@ namespace DiscordExample
             .UsingCommands(x =>
             {
                 x.AllowMentionPrefix = true;
+                // x.PrefixChar = '!';
+                // Please don't use !, there's a million bots that already do.
                 x.HelpMode = HelpMode.Public;
+                x.ExecuteHandler += (s, e) => _client.Log.Info("Command", $"[{((e.Server != null) ? e.Server.Name : "Private")}{((!e.Channel.IsPrivate) ? $"/#{e.Channel.Name}" : "")}] <@{e.User.Name}> {e.Command.Text} {((e.Args.Length > 0) ? "| " + string.Join(" ", e.Args) : "")}");
+                x.ErrorHandler = CommandError;
             })
             .UsingPermissionLevels((u, c) => (int)GetPermissions(u, c))
             .UsingModules();
@@ -49,12 +53,14 @@ namespace DiscordExample
             _client.ExecuteAndWait(async () =>
             {
                 await _client.Connect("token");
+
+                _client.Log.Info("Connected", $"Connected as {_client.CurrentUser.Name} (Id {_client.CurrentUser.Id})");
             });
         }
 
         private static PermissionLevel GetPermissions(User u, Channel c)
         {
-            if (u.Id == 0000) // Replace this with your own UserId
+            if (u.Id == 102528327251656704) // Replace this with your own UserId
                 return PermissionLevel.BotOwner;
 
             if (!c.IsPrivate)
@@ -75,6 +81,45 @@ namespace DiscordExample
                     return PermissionLevel.ChannelModerator;
             }
             return PermissionLevel.User;
+        }
+
+        private async void CommandError(object sender, CommandErrorEventArgs e)
+        {
+            if (e.ErrorType == CommandErrorType.Exception)
+            {
+                _client.Log.Error("Command", e.Exception);
+                await e.Channel.SendMessage($"Error: {e.Exception.GetBaseException().Message}");
+            }
+            else if (e.ErrorType == CommandErrorType.BadPermissions)
+            {
+                if (e.Exception?.Message == "This module is currently disabled.")
+                {
+                    await e.Channel.SendMessage($"The `{e.Command?.Category}` module is currently disabled.");
+                    return;
+                }
+                else if (e.Exception != null)
+                {
+                    await e.Channel.SendMessage(e.Exception.Message);
+                    return;
+                }
+
+                if (e.Command?.IsHidden == true)
+                    return;
+
+                await e.Channel.SendMessage($"You don't have permission to access that command!");
+            }
+            else if (e.ErrorType == CommandErrorType.BadArgCount)
+            {
+                await e.Channel.SendMessage("Error: Invalid parameter count.");
+            }
+            else if (e.ErrorType == CommandErrorType.InvalidInput)
+            {
+                await e.Channel.SendMessage("Error: Invalid input! Make sure your quotes match up correctly!");
+            }
+            else if (e.ErrorType == CommandErrorType.UnknownCommand)
+            {
+                // Only set up a response in here if you stick with a mention prefix
+            }
         }
 
         private void WriteLog(LogMessageEventArgs e)
