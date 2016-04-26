@@ -22,7 +22,7 @@ namespace DiscordExample
 
             manager.CreateCommands("", cgb =>
             {
-                g.MinPermissions((int)PermissionLevel.User);
+                cgb.MinPermissions((int)PermissionLevel.User);
 
                 cgb.CreateCommand("say")
                 .MinPermissions((int)PermissionLevel.BotOwner) // An unrestricted say command is a bad idea
@@ -33,7 +33,7 @@ namespace DiscordExample
                     await e.Channel.SendMessage(e.GetArg("text"));
                 });
 
-                cgb.CreateCommand("params")
+                cgb.CreateCommand("params") // This command doesn't have any use, just an example for ParamenterType.Multiple
                 .Description("Multiple paramter test")
                 .Parameter("text", ParameterType.Multiple)
                 .Do(async e =>
