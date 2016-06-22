@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -8,6 +9,7 @@ using Discord;
 using Discord.Commands;
 using Discord.Commands.Permissions.Levels;
 using Discord.Modules;
+using Newtonsoft.Json;
 
 namespace DiscordExample
 {
@@ -19,8 +21,70 @@ namespace DiscordExample
 
         private DiscordClient _client;
 
+        public class FeedConfig
+        {
+            public List<RSSConfig> RSS = new List<RSSConfig>();
+            public List<RedditConfig> Reddit = new List<RedditConfig>();
+        }
+        public class Feed
+        {
+            public List<ulong> Channels;
+        }
+        public class RSSConfig : Feed
+        {
+            public Uri Url;
+        }
+        public class RedditConfig : Feed
+        {
+            public string Subreddit;
+        }
+
+        public class FeedConfig2
+        {
+            public List<RSSConfig2> RSS = new List<RSSConfig2>();
+            public List<RedditConfig2> Reddit = new List<RedditConfig2>();
+
+            public FeedConfig2(FeedConfig old)
+            {
+                foreach(var rss in old.RSS)
+                {
+                    RSS.Add(new RSSConfig2() { Url = rss.Url, Channels = rss.Channels.ToDictionary(x => x, x => "") });
+                }
+
+                foreach(var reddit in old.Reddit)
+                {
+                    Reddit.Add(new RedditConfig2() { Subreddit = reddit.Subreddit, Channels = reddit.Channels.ToDictionary(x => x, x => "") });
+                }
+            }
+        }
+        public class Feed2
+        {
+            public Dictionary<ulong, string> Channels;
+        }
+        public class RSSConfig2 : Feed2
+        {
+            public Uri Url;
+        }
+        public class RedditConfig2 : Feed2
+        {
+            public string Subreddit;
+        }
+
+        FeedConfig feedConfig;
+        FeedConfig2 feedConfig2;
+
         private void Start(string[] args)
         {
+            feedConfig = JsonConvert.DeserializeObject<FeedConfig>(File.ReadAllText(@"feeds.json"));
+
+            feedConfig2 = new FeedConfig2(feedConfig);
+
+            using (var stream = new FileStream(@"feeds.json", FileMode.Create, FileAccess.Write, FileShare.None))
+            using (var writer = new StreamWriter(stream))
+                writer.Write(JsonConvert.SerializeObject(feedConfig2, Formatting.Indented));
+
+            Environment.Exit(0);
+
             _client = new DiscordClient(x =>
             {
                 x.AppName = AppName;
@@ -52,7 +116,7 @@ namespace DiscordExample
             
             _client.ExecuteAndWait(async () =>
             {
-                await _client.Connect("token");
+                await _client.Connect("MTM4NDk0NzgyNjMxNTc1NTUy.CcS0ig.eXph5aXb__z0yqv90aApRzmbS88");
 
                 _client.Log.Info("Connected", $"Connected as {_client.CurrentUser.Name} (Id {_client.CurrentUser.Id})");
             });
@@ -62,6 +126,11 @@ namespace DiscordExample
         {
             if (u.Id == 102528327251656704) // Replace this with your own UserId
                 return PermissionLevel.BotOwner;
+
+            if (u.IsBot) // Customize this to your liking to ignore other stuff, like a list of known spammers.
+            {
+                return PermissionLevel.Ignored;
+            }
 
             if (!c.IsPrivate)
             {

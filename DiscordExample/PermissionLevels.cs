@@ -2,6 +2,7 @@
 {
     public enum PermissionLevel
     {
+        Ignored = -1,
         User = 0,
         ChannelModerator, //Manage Messages (Channel)
         ChannelAdmin, //Manage Permissions (Channel)

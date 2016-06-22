@@ -34,16 +34,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Discord.Net, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.0.9.0-rc3-3\lib\net45\Discord.Net.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Discord.Net\src\Discord.Net.Commands.Net45\bin\Debug\Discord.Net.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.Commands, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Commands.0.9.0-rc3-1\lib\net45\Discord.Net.Commands.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Discord.Net\src\Discord.Net.Commands.Net45\bin\Debug\Discord.Net.Commands.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.Modules, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Modules.0.9.0-rc3\lib\net45\Discord.Net.Modules.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Discord.Net\src\Discord.Net.Modules.Net45\bin\Debug\Discord.Net.Modules.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
